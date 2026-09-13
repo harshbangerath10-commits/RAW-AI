@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>RAW AI</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #050510;
+  color: white;
+  height: 100vh;
+  overflow: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  width: 300px;
+  height: 300px;
+  background: #008cff;
+  filter: blur(150px);
+  opacity: .18;
+  top: -100px;
+  left: -100px;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  width: 300px;
+  height: 300px;
+  background: #8b2cff;
+  filter: blur(150px);
+  opacity: .15;
+  bottom: -100px;
+  right: -100px;
+}
+
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+}
+
+/* HEADER */
+
+header {
+  height: 70px;
+  display: flex;
+  align-items: center;
+  padding: 12px 18px;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+  background: rgba(10,10,25,.8);
+  backdrop-filter: blur(15px);
+}
+
+.logo {
+  width: 45px;
+  height: 45px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 20px;
+
+  background: linear-gradient(135deg,#00aaff,#7b2cff);
+
+  box-shadow: 0 0 20px #0077ff;
+}
+
+.title {
+  margin-left: 12px;
+}
+
+.title h1 {
+  font-size: 20px;
+  letter-spacing: 2px;
+}
+
+.title p {
+  font-size: 11px;
+  color: #aaa;
+  margin-top: 4px;
+}
+
+/* CHAT */
+
+#chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 15px 120px;
+}
+
+.welcome {
+  text-align: center;
+  margin-top: 60px;
+}
+
+.welcome h2 {
+  font-size: 28px;
+  margin-bottom: 12px;
+
+  background: linear-gradient(90deg,#00aaff,#b26cff);
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.welcome p {
+  color: #aaa;
+  line-height: 1.7;
+}
+
+/* SUGGESTIONS */
+
+.suggestions {
+  margin-top: 30px;
+}
+
+.suggestion {
+  padding: 15px;
+  margin: 10px;
+
+  border-radius: 16px;
+
+  background: rgba(255,255,255,.06);
+
+  border: 1px solid rgba(255,255,255,.08);
+
+  color: #ddd;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+/* MESSAGES */
+
+.message {
+  max-width: 85%;
+
+  padding: 12px 15px;
+
+  margin: 12px 0;
+
+  border-radius: 18px;
+
+  line-height: 1.5;
+
+  animation: fade .3s;
+}
+
+.user {
+  margin-left: auto;
+
+  background:
+  linear-gradient(135deg,#0077ff,#7b2cff);
+
+  border-bottom-right-radius: 5px;
+}
+
+.ai {
+  margin-right: auto;
+
+  background:
+  rgba(255,255,255,.08);
+
+  border:
+  1px solid rgba(255,255,255,.08);
+
+  border-bottom-left-radius: 5px;
+}
+
+/* INPUT */
+
+.input-area {
+
+  position: fixed;
+
+  bottom: 0;
+
+  width: 100%;
+
+  padding: 12px;
+
+  background:
+  rgba(5,5,16,.95);
+
+  border-top:
+  1px solid rgba(255,255,255,.08);
+
+}
+
+.input-box {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+}
+
+#messageInput {
+
+  flex: 1;
+
+  border: none;
+
+  outline: none;
+
+  padding: 14px;
+
+  border-radius: 25px;
+
+  background:
+  rgba(255,255,255,.08);
+
+  color: white;
+
+  font-size: 14px;
+
+}
+
+button {
+
+  border: none;
+
+  color: white;
+
+  cursor: pointer;
+
+}
+
+.icon-btn {
+
+  width: 44px;
+
+  height: 44px;
+
+  border-radius: 50%;
+
+  background:
+  rgba(255,255,255,.1);
+
+  font-size: 18px;
+
+}
+
+.send-btn {
+
+  width: 48px;
+
+  height: 48px;
+
+  border-radius: 50%;
+
+  font-size: 18px;
+
+  background:
+  linear-gradient(135deg,#00aaff,#7b2cff);
+
+  box-shadow:
+  0 0 15px rgba(0,170,255,.5);
+
+}
+
+/* ANIMATION */
+
+@keyframes fade {
+
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+<header>
+
+<div class="logo">
+R
+</div>
+
+<div class="title">
+
+<h1>RAW AI</h1>
+
+<p>Your Multilingual AI Assistant</p>
+
+</div>
+
+</header>
+
+
+<div id="chat">
+
+<div class="welcome">
+
+<h2>Hello, I'm RAW AI 🤖</h2>
+
+<p>
+
+Your Personal & Hotel Management Assistant
+
+<br>
+
+English • हिंदी • ಕನ್ನಡ
+
+</p>
+
+
+<div class="suggestions">
+
+<div class="suggestion"
+onclick="askSuggestion(this)">
+
+🏨 Explain Front Office operations
+
+</div>
+
+
+<div class="suggestion"
+onclick="askSuggestion(this)">
+
+📝 Help me prepare for my exams
+
+</div>
+
+
+<div class="suggestion"
+onclick="askSuggestion(this)">
+
+💡 Help me with something personal
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="input-area">
+
+<div class="input-box">
+
+<input
+type="file"
+id="fileInput"
+hidden
+>
+
+<button
+class="icon-btn"
+onclick="document.getElementById('fileInput').click()">
+
+📎
+
+</button>
+
+
+<input
+
+type="text"
+
+id="messageInput"
+
+placeholder="Ask RAW AI anything..."
+
+>
+
+
+<button
+
+class="icon-btn"
+
+onclick="startVoice()">
+
+🎤
+
+</button>
+
+
+<button
+
+class="send-btn"
+
+onclick="sendMessage()">
+
+➤
+
+</button>
+
+
+</div>
+
+</div>
+
+
+</div>
+
+
+<script>
+
+/* LOAD HISTORY */
+
+let history =
+JSON.parse(localStorage.getItem("rawHistory"))
+|| [];
+
+
+/* DISPLAY OLD CHAT */
+
+window.onload = function(){
+
+if(history.length > 0){
+
+document.querySelector(".welcome")?.remove();
+
+history.forEach(item => {
+
+addMessage(item.text,item.sender,false);
+
+});
+
+}
+
+};
+
+
+/* ADD MESSAGE */
+
+function addMessage(text,sender,save=true){
+
+const chat =
+document.getElementById("chat");
+
+const message =
+document.createElement("div");
+
+message.className =
+"message " + sender;
+
+message.innerText =
+text;
+
+chat.appendChild(message);
+
+chat.scrollTop =
+chat.scrollHeight;
+
+
+if(save){
+
+history.push({
+
+text:text,
+
+sender:sender
+
+});
+
+localStorage.setItem(
+
+"rawHistory",
+
+JSON.stringify(history)
+
+);
+
+}
+
+}
+
+
+/* SEND MESSAGE */
+
+function sendMessage(){
+
+const input =
+document.getElementById("messageInput");
+
+const text =
+input.value.trim();
+
+if(text === "")
+return;
+
+
+document
+.querySelector(".welcome")
+?.remove();
+
+
+addMessage(text,"user");
+
+
+input.value="";
+
+
+setTimeout(() => {
+
+const reply =
+generateReply(text);
+
+addMessage(reply,"ai");
+
+speak(reply);
+
+},600);
+
+}
+
+
+/* TEMPORARY AI BRAIN */
+
+function generateReply(text){
+
+let lower =
+text.toLowerCase();
+
+
+/* HOTEL MANAGEMENT */
+
+if(
+
+lower.includes("hotel")
+
+||
+
+lower.includes("front office")
+
+||
+
+lower.includes("housekeeping")
+
+||
+
+lower.includes("food")
+
+||
+
+lower.includes("f&b")
+
+){
+
+return "🏨 RAW AI: I understand this is related to Hotel Management. The complete AI connection will give you detailed answers, notes and exam preparation assistance.";
+
+}
+
+
+/* KANNADA */
+
+if(
+
+text.includes("ನನಗೆ")
+
+||
+
+text.includes("ಹೋಟೆಲ್")
+
+||
+
+text.includes("ಸಹಾಯ")
+
+){
+
+return "🤖 ನಮಸ್ಕಾರ! ನಾನು RAW AI. ನಾನು ನಿಮಗೆ ಕನ್ನಡದಲ್ಲಿ ಸಹಾಯ ಮಾಡಬಹುದು.";
+
+}
+
+
+/* HINDI */
+
+if(
+
+text.includes("मुझे")
+
+||
+
+text.includes("मदद")
+
+||
+
+text.includes("होटल")
+
+){
+
+return "🤖 नमस्ते! मैं RAW AI हूँ। मैं आपकी हिंदी में मदद कर सकता हूँ।";
+
+}
+
+
+/* GENERAL */
+
+return "🤖 RAW AI is ready! Currently you are using the offline Version 1 interface. Next we will connect a real AI brain so I can answer anything intelligently.";
+
+}
+
+
+/* ENTER KEY */
+
+document
+
+.getElementById("messageInput")
+
+.addEventListener(
+
+"keydown",
+
+function(event){
+
+if(event.key === "Enter"){
+
+sendMessage();
+
+}
+
+}
+
+);
+
+
+/* SUGGESTIONS */
+
+function askSuggestion(element){
+
+document
+.getElementById("messageInput")
+.value =
+element.innerText;
+
+sendMessage();
+
+}
+
+
+/* VOICE INPUT */
+
+function startVoice(){
+
+const SpeechRecognition =
+
+window.SpeechRecognition ||
+
+window.webkitSpeechRecognition;
+
+
+if(!SpeechRecognition){
+
+alert(
+
+"Voice recognition is not supported in this browser. Try Google Chrome."
+
+);
+
+return;
+
+}
+
+
+const recognition =
+
+new SpeechRecognition();
+
+
+recognition.lang =
+"en-IN";
+
+
+recognition.start();
+
+
+recognition.onresult =
+
+function(event){
+
+const speech =
+
+event.results[0][0].transcript;
+
+
+document
+.getElementById("messageInput")
+.value =
+speech;
+
+};
+
+}
+
+
+/* VOICE OUTPUT */
+
+function speak(text){
+
+if("speechSynthesis" in window){
+
+const speech =
+new SpeechSynthesisUtterance(text);
+
+speech.lang =
+"en-IN";
+
+window
+.speechSynthesis
+.speak(speech);
+
+}
+
+}
+
+</script>
+
+
+</body>
+
+</html>
